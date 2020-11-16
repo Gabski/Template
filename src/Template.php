@@ -2,52 +2,66 @@
 
 namespace Template;
 
+/**
+ * Class Template
+ * @package Template
+ */
 class Template
 {
-    private $template, $keys, $path, $type;
+    private $template, $keys, $path, $type, $source;
 
+    /**
+     * Template constructor.
+     * @param null   $template
+     * @param string $path
+     * @param string $type
+     */
     public function __construct($template = null, $path = "templates/", $type = "tpl")
     {
         $this->load($template, $path, $type);
     }
 
+    /**
+     * @param null   $template
+     * @param string $path
+     * @param string $type
+     */
     public function load($template = null, $path = "templates/", $type = "tpl")
     {
         $this->template = $template;
-        $this->path = $path;
-        $this->type = $type;
+        $this->path     = $path;
+        $this->type     = $type;
+
+        $this->source = file_get_contents($this->path . $this->template . '.' . $this->type);
     }
 
+    /**
+     * @param $key
+     * @param $value
+     */
     public function key($key, $value)
     {
-        $this->keys[strtoupper($key)] = $value;
+        $this->keys[$key] = $value;
     }
 
-    public function init()
+    /**
+     * @return bool
+     */
+    public function render()
     {
-
-        $source = @file_get_contents($this->path . $this->template . '.' . $this->type);
-
-        if ($source) {
-
-            preg_match_all("/{include (.*?)}/i", $source, $matches);
-
-            if (!empty($matches)) {
-                for ($i = 0; $i < count($matches[0]); $i++) {
-                    $new = @file_get_contents($this->path . $matches[1][$i]);
-                    $source = str_replace($matches[0][$i], $new, $source);
-                }
-            }
-
-            if (!empty($this->keys)) {
-                foreach ($this->keys as $key => $value) {
-                    $source = str_replace('{' . $key . '}', $value, $source);
-                }
-            }
-
-            return $source;
-        } else {
+        if (!$this->source) {
             return false;
         }
+
+        $modules = [
+            new IncludeModule($this->path),
+            new KeyModule($this->keys),
+        ];
+
+        foreach ($modules as $module) {
+            $this->source = $module->processSource($this->source);
+        }
+
+        return $this->source;
     }
 }
