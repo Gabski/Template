@@ -2,15 +2,30 @@
 
 namespace Template;
 
+/**
+ * Class IncludeModule
+ * @package Template
+ */
 class IncludeModule implements TemplateModuleInterface
 {
+    /**
+     * @var string
+     */
     private $path;
 
+    /**
+     * IncludeModule constructor.
+     * @param string $path
+     */
     public function __construct(string $path)
     {
         $this->path = $path;
     }
 
+    /**
+     * @param string $source
+     * @return string
+     */
     public function processSource(string $source): string
     {
         $newSource = $source;

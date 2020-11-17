@@ -13,11 +13,13 @@ class Template
     /**
      * Template constructor.
      * @param null   $template
+     * @param array  $keys
      * @param string $path
      * @param string $type
      */
-    public function __construct($template = null, $path = "templates/", $type = "tpl")
+    public function __construct($template = null, $keys = [], $path = "templates/", $type = "tpl")
     {
+        $this->keys = $keys;
         $this->load($template, $path, $type);
     }
 
@@ -39,7 +41,7 @@ class Template
      * @param $key
      * @param $value
      */
-    public function key($key, $value)
+    public function addKey($key, $value)
     {
         $this->keys[$key] = $value;
     }
